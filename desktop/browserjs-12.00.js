@@ -1,6 +1,6 @@
-// M8GaqvxBfd+njdY8EP/aLUZA06EMz/pY6TKae5tEG64pg2qt9ETd+q+ow7z5XFkTIFCIY7tPB/S3ikNfSvQyy1eaf/X70SQr0/X7Qaplkmhn8FW7zGWOp3W21tgMum6OPF4S+RD5Y5Xy7GOMSo1B4EHbHuNDEktSgO287lUUAR5whGwfdCO2BWnr5XRzcfiM9pG+XvDjWHmK5jvbIbL7tHi24wBOblLgab94oe0WRD2LdwHD1zLBXenu2xNM2gK/BiQnxuHUlEbsTSCHWMobr0Lzivnu8oWBE7E4HkvAxniwbUow/nUhz4f0H35lJ7w0rbig1wUCNXNgMhnu7HJGiA==
+// Q7l1hmwJo8CnDPUXG4sWBbMrfVQcCGZz67pVdIaP/2tkSFikOEfQuTqjvR5oqzLyPGbkUCUayE34K9WIWQr1DkbwKZjMYKGXO3h9qY73YLoVTQjP4KcbSdbdaNIIIDZOFU/xH2WVwcKVsxeKP+QuK6ghXLzWcox5VPIJK4CU6ayPNGh9S/AUTJKTkNAHpqmJH2v0QKOB+YB3FMvpznvYN1zJCZiCEImmxTmXgdVZNtjIBjfkbyrOMojJJG7xPsbyPxziQniwVdPUdY7bkVY6Hh8iHgNVzy5ZVVBNXiUdae+u5OGCxHQB4596uko9GXkHmIc7xnAG+CYUy+9rGnYd7w==
 /**
-** Copyright (C) 2000-2011 Opera Software AS.  All rights reserved.
+** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
 ** This file is part of the Opera web browser.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.238, December 22, 2011. Active patches: 175 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.238, January 9, 2012. Active patches: 174 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -304,24 +304,6 @@ function ignoreRequiredAttributes(){
 		}
 	},true);
 }
-function injectJQueryForAmazon(){
-	if (navigator.appName=='Opera'){
-		document.documentElement.appendChild(document.createElement('script')).src='//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';
-		document.documentElement.appendChild(document.createElement('script')).innerText=
-			'var threadValidator={cdCheckThreadPost:function(){return true},cdOpenPostBox:function(){}};'
-			+'var AmazonPopoverImages={};'
-			+'$.fn.amazonPopoverTrigger=function(){};'
-			+'$.fn.removeAmazonPopoverTrigger=function(){return this};';
-		opera.defineMagicVariable('amznJQ', function(obj){
-			if(obj.onReady.toString().match(/\(\)\s*{\s*}/))obj.onReady=function(str,func){$(document).ready(func)};
-			if(obj.available.toString().match(/\(\)\s*{\s*}/))obj.available=function(str,func){$(document).one(str+".loaded", func);$(document).trigger(str+".loaded");}
-			if(obj.addLogical.toString().match(/\(\)\s*{\s*}/))obj.addLogical=function (str,urls){for(var num in urls){document.documentElement.appendChild(document.createElement('script')).src=urls[num];}}
-			if(!obj.chars)obj.chars={BACKSLASH: "\\", DQUOTE:"\"", EOL:"\n",SQUOTE:"'",YEN:"¥"};
-			if(!obj.jQuery)obj.jQuery=$; /* Note: Amazon also defines more custom properties on the jQuery object*/
-			return obj;
-		}, null);
-	}
-}
 function sendOperaEvent(name, target){
 	initEvent.call=createEvent.call=dispatchEvent.call=call;
 	var evt=createEvent.call(document, 'Event');
@@ -474,7 +456,7 @@ function setTinyMCEVersion(e){
 				}, false);
 				addEventListener.call(opera, 'BeforeEvent.load', function(e){
 					match.call=call;
-					if( match.call(e.event.target.tagName, /iframe/i) && ( match.call(e.event.target.name, /^mce_editor_\d/ ) || match.call(e.event.target.id, /^mce_editor_\d/ ))){
+					if( e.event.target.tagName==='IFRAME' && ( match.call(e.event.target.name, /^mce_editor_\d/ ) || match.call(e.event.target.id, /^mce_editor_\d/ ))){
 						setTinyMCEVersion();
 						sendOperaEvent('bjsOnTinyMCEInstance', e.event.target);
 					}
@@ -664,6 +646,10 @@ function setTinyMCEVersion(e){
 		/* AOL */
 	
 	
+		if(hostname.indexOf('.aol.fr')>-1){			// PATCH-563, aol.fr: gice Opera better styling
+			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (aol.fr: gice Opera better styling). See browser.js for details');
+		}
 		if(hostname.indexOf('.aol.jp')>-1){			// PATCH-45, AOL.jp sniffing prevents styling
 			document.addEventListener('DOMContentLoaded', function(){document.documentElement.className='SAF';}, false);
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (AOL.jp sniffing prevents styling). See browser.js for details');
@@ -686,6 +672,9 @@ function setTinyMCEVersion(e){
 		 addCssToDocument('#globalheader #globalnav li{width: auto !important}');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make Apple Store menu visible\nEnable menu on Apple support pages\nEnable menu on Apple community pa...). See browser.js for details');
+	} else if(hostname.indexOf('.cnet.com')>-1){			// PATCH-567, cnet: remove box-shadow to improve scrolling performance
+		addCssToDocument('*{box-shadow:none!important;}');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnet: remove box-shadow to improve scrolling performance). See browser.js for details');
 	} else if(hostname.indexOf('.dell.')!=-1&&hostname.indexOf('support.')!=-1){			// 286618,  browser sniffing on support.dell.com
 		opera.defineMagicVariable( 'ig_shared', null, function(o){ o.IsNetscape6=true; return o; } );
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( browser sniffing on support.dell.com). See browser.js for details');
@@ -735,7 +724,11 @@ function setTinyMCEVersion(e){
 				}
 			}, false);
 			
-				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (eBay mixes security origins, basic photo upload fails). See browser.js for details');
+					// PATCH-565, ebay: make sign in buttons accessible with spatnav
+			if(hostname.indexOf('signin.ebay.')>-1){
+			 addCssToDocument('#but_sgnBt, #but_register_signin{margin-left:0;padding-left: 8px;}');
+			}
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (eBay mixes security origins, basic photo upload fails\nebay: make sign in buttons accessible with sp...). See browser.js for details');
 		}
 		if(hostname.indexOf('.ebaydesc.')>-1){			// PATCH-195, Avoid IFRAME resize causing lots of empty space on auctions (the IFRAME part)
 			window.addEventListener('load', function(){ 
@@ -817,6 +810,10 @@ function setTinyMCEVersion(e){
 			}, true);
 			
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Google Spreadsheets cell size and column label size mismatch\nDelay mousedown event on Flash file up...). See browser.js for details');
+		}
+		if(hostname.indexOf('mail.google.')>-1){			// PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance
+			addCssToDocument('div.wl{overflow:inherit}body.aam{position:inherit}');
+				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GMail: override overflow and fixed position styles to improve scrolling performance). See browser.js for details');
 		}
 		if(hostname.indexOf('plus.google')>-1){			// PATCH-526, G+: avoid tall narrow posts due to word-wrap in table 
 			addCssToDocument('div.B-u-nd-nb {display:block}');
@@ -1088,29 +1085,11 @@ function setTinyMCEVersion(e){
 			}
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Get rid of browser warning on Alfresco help pages). See browser.js for details');
-	} else if(hostname.indexOf('amazon.')>-1){			// PATCH-481, Add jQuery to Amazon offer-listing pages
-		if(pathname.indexOf('/offer-listing/')!=-1)injectJQueryForAmazon();
-				// PATCH-483, Add jQuery to Amazon Shopping Basket page
-		if(pathname.indexOf('/cart/view.html')!=-1)injectJQueryForAmazon();
-				// PATCH-489, Add jQuery to Amazon product page
-		if(pathname.indexOf('p/buy/')==-1 && pathname.match(/\/[dg]p.*\/[\w\d]{10}(?:\/.*)?$/)){
-			injectJQueryForAmazon();
-			if (hostname.indexOf('.com')>-1&&location.hash=='#reader-link') { /* Amazon blocks Opera from See Inside The Book */
-				document.addEventListener('DOMContentLoaded',function(e){
-					if (msg&&msg.style.display=='block') {
-						var ASIN=document.getElementById('ASIN');
-						if (ASIN){window.stop();history.replaceState({},'','/gp/sitbv3/reader/?asin='+ASIN.value);location.reload();}
-					}
-				},false);
-			}
-		}
-				// PATCH-527, Add more spoofing when masking as another browser on Amazon
+	} else if(hostname.indexOf('amazon.')>-1){			// PATCH-527, Add more spoofing when masking as another browser on Amazon
 		if (navigator.appName!=='Opera'){
 			document.documentElement.style.MozAppearance = 'Opera';
 		}
-				// PATCH-533, Add jQuery to Amazon At A Glance page
-		if(pathname.indexOf('/aag/')!=-1)injectJQueryForAmazon();
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Add jQuery to Amazon offer-listing pages\nAdd jQuery to Amazon Shopping Basket page\nAdd jQuery to A...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Add more spoofing when masking as another browser on Amazon). See browser.js for details');
 	} else if(hostname.indexOf('ameba.jp')!=-1){			// 331093, Enable blog post editor on ameba.jp
 		navigator.product='Gecko';
 		navigator.userAgent=navigator.userAgent.replace('Opera', '0pera (spoofing as Firefox)');
@@ -1597,17 +1576,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('westjet.com')>-1 ){			// PATCH-260,  Westjet browser sniffing warns against Opera
 		opera.defineMagicVariable('browser', function(o){ o.isSupported=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Westjet browser sniffing warns against Opera). See browser.js for details');
-	} else if(hostname.indexOf('www.weather.com')>-1){			// PATCH-294, Hide extra button text on weather.com
-		document.addEventListener('DOMContentLoaded',
-		 function(){
-		  elm = document.getElementsByClassName('twc-weather-search-submit')[0];
-		  if(elm && elm.type=='submit'){
-		   elm.value='';
-		  }
-		 },
-		 false
-		);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Hide extra button text on weather.com). See browser.js for details');
 	} else if(hostname.indexOf('www.yoka.com')>-1){			// PATCH-238, Override minmax IE helper script
 		opera.defineMagicFunction('minmax_scan', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Override minmax IE helper script). See browser.js for details');
@@ -1694,7 +1662,7 @@ function setTinyMCEVersion(e){
 					getstr = getstr.replace(/&$/,""); //remove trailing &
 					var xhr = new XMLHttpRequest();
 		                        var url = form.action;
-		                        if(form.target!="")url += "#"+form.target;//testing new ERP
+		                        if(form.target!="")url += "#"+form.target;
 					xhr.open("POST",url,true);
 					xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 					xhr.send(getstr);
@@ -1702,6 +1670,25 @@ function setTinyMCEVersion(e){
 					doSubmitEmptyData = original_function;
 			}
 		},false);
+		opera.addEventListener("BeforeEvent.click", function(e){
+			/*
+			Opera doesn't send unload events in all cases. Check if
+			a mouse click is about to replace a named frame (target). 
+			If it will, iterate over the subframes and send an unload event.
+			*/
+			if(e.event.target.nodeName=="A" && e.event.target.getAttribute('target')!=null){
+				trgt = e.event.target.getAttribute('target');
+				if(trgt.indexOf('_rightside')){
+					f = parent.frames[trgt];
+					for(i=0;i<f.frames.length;i++){
+						var evt=document.createEvent('Event');
+						evt.initEvent('unload', true, true);
+						f.frames[i].dispatchEvent(evt);
+					}
+				}
+			}
+		}
+		,false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix Ctrl-G shortcut in Maconomy\nFix unload form submit behavior on Maconomy portals). See browser.js for details');
 	} else if(pathname.indexOf('/AnalyticalReporting/')==0){			// PATCH-555, Analytix: add missing end quote
 		if(pathname.indexOf('AnalyticalReporting/WebiModify.do')>-1 || pathname.indexOf('AnalyticalReporting/WebiCreate.do')>-1){
