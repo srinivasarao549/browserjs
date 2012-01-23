@@ -1,4 +1,4 @@
-// Q7l1hmwJo8CnDPUXG4sWBbMrfVQcCGZz67pVdIaP/2tkSFikOEfQuTqjvR5oqzLyPGbkUCUayE34K9WIWQr1DkbwKZjMYKGXO3h9qY73YLoVTQjP4KcbSdbdaNIIIDZOFU/xH2WVwcKVsxeKP+QuK6ghXLzWcox5VPIJK4CU6ayPNGh9S/AUTJKTkNAHpqmJH2v0QKOB+YB3FMvpznvYN1zJCZiCEImmxTmXgdVZNtjIBjfkbyrOMojJJG7xPsbyPxziQniwVdPUdY7bkVY6Hh8iHgNVzy5ZVVBNXiUdae+u5OGCxHQB4596uko9GXkHmIc7xnAG+CYUy+9rGnYd7w==
+// HvzMDq0JVwfHCuc2DHGwhH878+h/p0xAkSR3Ye3ySOFwX/YUTA36FcDRqOmv07y2yN31DL0kXvbzNMU8QenscbBJ8cqfmTKFqTwJon/hgsDZrCL6PSTh0nQklR5sH+dfsybYJJw7/pEWBuMWxCqeH3s6LHrYLQzmes1/kBxwbuiQmuVh+fw/oFWxa0gvGLXO1CBFH0PGH5XiBnVg0PF2jp2UOdsQTqdRlIiuDUpSABbDtoLOTqoEaShiBpcnu5GWI+UBKJjuUCmgEq3RxvD6wiY6nkkjf7UPuobMJV3en9OqsAtSiadXfGYhjMWUrQ7fEf7wwwonhfjVYvLMdZvHzg==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.238, January 9, 2012. Active patches: 174 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.238, January 20, 2012. Active patches: 174 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1162,19 +1162,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('cdec-sic.cl')!=-1){			// 365516, Old HierMenus on cdec-sic.cl
 		fixHierMenus();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Old HierMenus on cdec-sic.cl). See browser.js for details');
-	} else if(hostname.indexOf('chaseonline.chase.com')!=-1){			// 243036, chase.com field refocus from onkeypress-problem
-		opera.defineMagicFunction('handleTabs', function(oT, oF, name){
-			var el=document.getElementById(name);
-			if(el && el.value.length+1>=el.maxLength && !(event.keyCode==8||event.keyCode==46)){
-				setTimeout( function(){ jumpToNext(el); }, 100);
-			}
-			function jumpToNext(el){
-				var i=0;
-				if(el.form){while(el!=el.form[i])i++;}else{ return;}
-				if(el.form[i+1])el.form[i+1].focus();
-			}
-		});
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (chase.com field refocus from onkeypress-problem). See browser.js for details');
 	} else if(hostname.indexOf('cnnturk.com')>-1){			// PATCH-509, cnnturk: work around CSS bug that causes footer content to float upwards
 		addCssToDocument('#fbtm div.dtc ul{position: static !important; display:inline !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnnturk: work around CSS bug that causes footer content to float upwards). See browser.js for details');
@@ -1235,6 +1222,11 @@ function setTinyMCEVersion(e){
 		}, false);
 				// PATCH-558, Facebook avoid chat list scroll
 		addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
+				// PATCH-573, Facebook's border-radius triggers hyperactive reflow bug, performance suffers
+		opera.addEventListener('BeforeCSS', function(e){
+			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
+		}, false);
+		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook ...). See browser.js for details');
 	} else if(hostname.indexOf('g4tv.com')>-1){			// PATCH-281, messed up layout in lower part of page due to wrong percentage rounding
 		window.addEventListener('DOMContentLoaded', function(e){
@@ -1287,13 +1279,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('journalism.org')>-1){			// PATCH-523, journalism.org: fix old IFrame SSI script
 		fixIFrameSSIscriptII('resizeIframe');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (journalism.org: fix old IFrame SSI script). See browser.js for details');
-	} else if(hostname.indexOf('klm.com')>-1){			// PATCH-448, klm.com: Fix broken resizing of iframes
-		opera.addEventListener('BeforeScript',function (ev) {
-			if(ev.element.src && ev.element.src.indexOf('applications.js')>-1){
-				ev.element.text = ev.element.text.replace(/iframe\.style\.height=y\+'px';/g,"iframe.style.height=parseInt(y)+'px';");
-			}
-		},false);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (klm.com: Fix broken resizing of iframes). See browser.js for details');
 	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){			// PATCH-348, Disable Opera detection that causes hidden content
 		opera.defineMagicVariable('op', function(){return false}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Disable Opera detection that causes hidden content). See browser.js for details');
@@ -1507,6 +1492,9 @@ function setTinyMCEVersion(e){
 		});
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable the password box on smithbarney.com). See browser.js for details');
+	} else if(hostname.indexOf('smn.gov.ar')>-1){			// PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping
+		addCssToDocument('input#busqueda{max-width:108px}');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (smn.gov.ar: reduce search input width to avoid wrapping). See browser.js for details');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){			// PATCH-415, Browser sniffing causes 404 page on login to Maybank
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes 404 page on login to Maybank). See browser.js for details');
