@@ -1,4 +1,4 @@
-// c4k3N2EntyNmzS/ddbj+COSGMBtlvjG/7FVu2zOXajuPWISgx3PQ417153J9LBswxqM3m2OB1Cum3XEwc7WwZemtD5BqPdnxKWu63GqMSKjyGim803dGjqT+sFKQx5KL/TzwCFxeyJDBbd2flVxr1L51uRzL9HA0dQAp2wS+azixpscxTuzpVibQWSKYz3oRyoavQ+Fa94zb8jwCcgIy13QGeIHqjiRMDA8fTb2zkWcLF9CbYz6BF4M9vUZ6+lAg+Xygl0B1YpEqFEOmz4/Q2rywm5B8SKj/wMb3rKMpfbqOl0Y5NCTqiEhlXB094rK4JrrHWIIlbRwx8vrVNZ9CWQ==
+// bY5rtEDJJ3DLH5FIrLEPCGO57c0cZoYLHFplJ2XU8B1pMpD7C2MiyNa8FCJ6nly/rNlU2sG+UaEhi1+xNXRalHYb7KlAQQqqOExbLvHot3UuMWrcUHSiOuSUecdaOdgRKcvh+fJxBlQVikrGNQhLlRAgANzXyEHk1bqtkruiEQs2l2MaYfIXsk9hs+aNQyrjdB66OVYYnG9073eqBM0pdHmCSZdDEgqyelowJ+fYVwSuuuANOUhAfUYDtxzizaNCEYYsfLV/K3fCj7deNwevzV3qwjy3j/YJPMMM/IOqzbkYUqTR6Bmzx6ZOJWord2VNzkbLDFwnYKP3dw+AoIPzow==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, January 9, 2012. Active patches: 211 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, January 23, 2012. Active patches: 210 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -675,11 +675,6 @@ function setTinyMCEVersion(e){
 		 addCssToDocument('#globalheader #globalnav li{width: auto !important}');
 		}
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make Apple Store menu visible\nEnable menu on Apple support pages\nEnable menu on Apple community pa...). See browser.js for details');
-	} else if(hostname.indexOf('.bestbuy.com')>-1){			// PATCH-392, Fix bestbuy menus
-		document.addEventListener('DOMContentLoaded',function(){
-					addCssToDocument('#nav li ul, #nav li.nav-pro ul ul, #nav li.sfhover ul ul { left: -999px}');	
-				},false)
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix bestbuy menus). See browser.js for details');
 	} else if(hostname.indexOf('.cnet.com')>-1){			// PATCH-567, cnet: remove box-shadow to improve scrolling performance
 		addCssToDocument('*{box-shadow:none!important;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnet: remove box-shadow to improve scrolling performance). See browser.js for details');
@@ -1282,19 +1277,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('cdec-sic.cl')!=-1){			// 365516, Old HierMenus on cdec-sic.cl
 		fixHierMenus();
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Old HierMenus on cdec-sic.cl). See browser.js for details');
-	} else if(hostname.indexOf('chaseonline.chase.com')!=-1){			// 243036, chase.com field refocus from onkeypress-problem
-		opera.defineMagicFunction('handleTabs', function(oT, oF, name){
-			var el=document.getElementById(name);
-			if(el && el.value.length+1>=el.maxLength && !(event.keyCode==8||event.keyCode==46)){
-				setTimeout( function(){ jumpToNext(el); }, 100);
-			}
-			function jumpToNext(el){
-				var i=0;
-				if(el.form){while(el!=el.form[i])i++;}else{ return;}
-				if(el.form[i+1])el.form[i+1].focus();
-			}
-		});
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (chase.com field refocus from onkeypress-problem). See browser.js for details');
 	} else if(hostname.indexOf('cnnturk.com')>-1){			// PATCH-509, cnnturk: work around CSS bug that causes footer content to float upwards
 		addCssToDocument('#fbtm div.dtc ul{position: static !important; display:inline !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnnturk: work around CSS bug that causes footer content to float upwards). See browser.js for details');
@@ -1370,6 +1352,11 @@ function setTinyMCEVersion(e){
 		}, false);
 				// PATCH-558, Facebook avoid chat list scroll
 		addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
+				// PATCH-573, Facebook's border-radius triggers hyperactive reflow bug, performance suffers
+		opera.addEventListener('BeforeCSS', function(e){
+			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
+		}, false);
+		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook ...). See browser.js for details');
 	} else if(hostname.indexOf('fantasy.nfl.com')>-1){			// PATCH-303, Reporting different clientHeight and scrollHeight for TEXTAREA breaks commenting on nfl.com
 		HTMLTextAreaElement.prototype.__defineGetter__('clientHeight', function(){
@@ -1459,13 +1446,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('journalism.org')>-1){			// PATCH-523, journalism.org: fix old IFrame SSI script
 		fixIFrameSSIscriptII('resizeIframe');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (journalism.org: fix old IFrame SSI script). See browser.js for details');
-	} else if(hostname.indexOf('klm.com')>-1){			// PATCH-448, klm.com: Fix broken resizing of iframes
-		opera.addEventListener('BeforeScript',function (ev) {
-			if(ev.element.src && ev.element.src.indexOf('applications.js')>-1){
-				ev.element.text = ev.element.text.replace(/iframe\.style\.height=y\+'px';/g,"iframe.style.height=parseInt(y)+'px';");
-			}
-		},false);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (klm.com: Fix broken resizing of iframes). See browser.js for details');
 	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){			// PATCH-348, Disable Opera detection that causes hidden content
 		opera.defineMagicVariable('op', function(){return false}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Disable Opera detection that causes hidden content). See browser.js for details');
@@ -1720,6 +1700,9 @@ function setTinyMCEVersion(e){
 		});
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Enable the password box on smithbarney.com). See browser.js for details');
+	} else if(hostname.indexOf('smn.gov.ar')>-1){			// PATCH-572, smn.gov.ar: reduce search input width to avoid wrapping
+		addCssToDocument('input#busqueda{max-width:108px}');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (smn.gov.ar: reduce search input width to avoid wrapping). See browser.js for details');
 	} else if(hostname.indexOf('sslsecure.maybank.com')>-1){			// PATCH-415, Browser sniffing causes 404 page on login to Maybank
 		opera.defineMagicFunction('MM_checkBrowser', function(){});
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Browser sniffing causes 404 page on login to Maybank). See browser.js for details');
