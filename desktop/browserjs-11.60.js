@@ -1,4 +1,4 @@
-// hnEfZIbNrgcCz6wccyfgCVLsq8afWXAOVabCqC96pthQZIrLGMZiPFnNJuhOnD8KuLoKQKcnMNmLYb8PDN2NEGJWr2USBQvzf1KQ9ghF3ogD2+9IZBvu+qPyrzsZT7HwgiOgiBQAC+oRZ84pXEcHK2S9LVVjEN14KOS8WtFTMQAOaUxCyrFYmHy5TqU3XuDVLxTF5JirHQnvapiH7Rhdb24fcPMcm+YhuADVHEsNr69tDaH7k5mNK/L8y+bqmCTc1OFh9F5LJXK+rXz1LfoBNdA/clb6tm8aLQASmJwT0aazuRw+qhUqOZ5RZi0CUEM/6EHBrRoyNk40Lie5lSoMbg==
+// ABCxfdR6gUBLeG7hJL7ya+Z217BLkEJ46MRZMZDj0NueLqTnstHu5he8obdC3YvrGfOVAUNKbegpOkIkxXeKYeUej7Tg5HE9cLbBqbTVS44Aq6gYEXpBau3ehKvmVocVuVhEtgGmkSf8YghBpvXKfBC7B35/w6KpkobyMWGUM/SdmUaytvoxcHCwhoUe9uxV1lHHptCxdOnARi6Qp7uECdZ2DEhNnpvWD4oB/hKl69qpRMpWIjYA0OHZyHbaCBwOAlY0cE1Che2fs0Sa+QHiEA9qlmRHaJo2vBsezpGJaoOGC+NOpD6NWNIu55UKrzFhnebWDUwfbUFQcQ4N6iIOWg==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.60 core 2.10.229, February 13, 2012. Active patches: 178 ';
+	var bjsversion=' Opera Desktop 11.60 core 2.10.229, February 20, 2012. Active patches: 181 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -811,7 +811,7 @@ function setTinyMCEVersion(e){
 		if(hostname.indexOf('mail.google.')>-1){			// PATCH-566, GMail: override overflow and fixed position styles to improve scrolling performance
 			addCssToDocument('div.wl{overflow:inherit}body.aam{position:inherit}');
 					// PATCH-582, GMail: override workaround for old font-size bug in Opera
-			addCssToDocument('body.editable.LW-avf{font-size: small}');
+			addCssToDocument('body.editable.LW-avf{font-size: small !important}');
 				if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GMail: override overflow and fixed position styles to improve scrolling performance\nGMail: override...). See browser.js for details');
 		}
 		if(hostname.indexOf('plus.google')>-1){			// PATCH-526, G+: avoid tall narrow posts due to word-wrap in table 
@@ -1152,7 +1152,7 @@ function setTinyMCEVersion(e){
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Bing Maps deadlock on accessing document.cookie from Silverlight). See browser.js for details');
 	} else if(hostname.indexOf('boards.4chan.org')>-1){			// PATCH-585, 4chan: add bottom margin to blockquote for better readability
-		addCssToDocument('td.reply blockquote{margin-bottom: 1em}');
+		addCssToDocument('td.reply blockquote, td.replyhl blockquote{margin-bottom: 1em}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (4chan: add bottom margin to blockquote for better readability). See browser.js for details');
 	} else if(hostname.indexOf('britannica.com')>-1){			// 332948, Prevent overwriting document with stats graphic on britannica.com
 		avoidDocumentWriteAbuse();
@@ -1348,6 +1348,13 @@ function setTinyMCEVersion(e){
 				// PATCH-135, Live Mail Fix removing contacts from To field by clicking small X icon
 		addCssToDocument('.ContactPicker_AutoComplete img{position:static!important;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
+	} else if(hostname.indexOf('mb.softbank.jp')!=-1){			// PATCH-588, SoftBank Mobile History Plugin browser sniffing
+		window.opera.addEventListener('BeforeScript', function (e) {
+			if (e.element.src.indexOf('history.js') > -1) {
+				e.element.text = e.element.text.replace(/if \(!this.is_op && hash\)/gi, 'if (hash)');
+			}
+		}, false);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SoftBank Mobile History Plugin browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('merriam-webster.com')>-1){			// PATCH-540, Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.
 		addCssToDocument('embed[hidden=true]{display:inline;width:0;height:0;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.). See browser.js for details');
@@ -1441,6 +1448,11 @@ function setTinyMCEVersion(e){
 		},false);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Rabobank cancels t keypress). See browser.js for details');
+	} else if(hostname.indexOf('rede-expressos.pt')>-1 ){			// PATCH-422, Miscalculated IFRAME height prevents booking on rede-expressos
+		addCssToDocument('#fraHorarioIN, #fraBil1IN{min-height: 250px !important}');
+		
+			
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Miscalculated IFRAME height prevents booking on rede-expressos). See browser.js for details');
 	} else if(hostname.indexOf('renren.com')>-1){			// PATCH-536, renren.com - Unicode space like characters should not be converted in document.title
 		var getter=document.__lookupGetter__('title');
 		var setter=document.__lookupSetter__('title');
@@ -1558,6 +1570,17 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('tvguide.com')>-1){			// PATCH-274, TVGuide doesn't show program descriptions, due to browser sniffing
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (TVGuide doesn\'t show program descriptions, due to browser sniffing). See browser.js for details');
+	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-561, Twitter: allow selection in TEXTAREA
+		HTMLTextAreaElement.prototype.setAttribute=(function(s){
+			return function(n, v){
+				if(n=='dir' && this.getAttribute(n)===v){
+					return;
+				}
+				return s.apply(this,arguments);
+			}
+		})(HTMLTextAreaElement.prototype.setAttribute);
+		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: allow selection in TEXTAREA). See browser.js for details');
 	} else if(hostname.indexOf('vgtv.no')>-1 || hostname.indexOf('movenetworkshd.com')>-1){			// PATCH-110, Work around browser sniffing for Move media player
 		opera.defineMagicVariable('QI', function(o){ o.browserIsGood=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around browser sniffing for Move media player). See browser.js for details');
