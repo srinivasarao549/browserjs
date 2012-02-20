@@ -1,4 +1,4 @@
-// lU0ZGe8+5kDckFC1CbtIRZcCnaW1Z3MY30NtFCjljFqXHsk5mDHwZnyepc64DYgyT3UgBGY+RBqZ7WzgKzP+HHxL2DWGKHeBi9di94G/fBFhxoU0QZV0fZnxJSPkzAVAomveUGiigjo4hqt2gC44LAmX5QteYCY5FqAbF4e4FMa7/Wa0OQC+O/pPLsLAg3E7FXQc+B0sB6abHwuoa0uhSyHSfHJGSG2yhc3tDt9BJPtbYTUgsObtkkVd26UeSk+QRHdcF9cWl87N8YeTPF/SZ55m87T+xvAtqMVTiKOoO3oi/Di5vAoV3eIBnn+g0azSMjwCXrFAwjvQbUStf92xZg==
+// TuvhcrSw/020pbonBJQ3t7Dbr/PeD11GFughTNJkCPGRjzTrYXn0PcQp3IdHfJ3Hj9vymGgpKyTNYKwfZ1iQVbC6lCaPeDAZRTDKM93yD0o3GV4OCRywdX29XYYn19rvP6qhmyeEvNfmEueFFMO6G5EsPk00JppACssTX2P0gkoB17RIwJu6uNCbQ1yQo6tLqcRKfn8Js7RBFoMW5GaombP2L1C9DgqQAiFmLnOegE9bT8vRtsWFYNNoJYtVJ56KQmWafc3IiZZF9lcmIPzgox/PvIHSqCY2P9ZSjj3gbdmfHD+Fg0AmWX3Ts4cTt4fXYIH9cvfDc89ueaew0Udszg==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, February 13, 2012. Active patches: 208 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, February 20, 2012. Active patches: 211 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1529,6 +1529,13 @@ function setTinyMCEVersion(e){
 				// PATCH-135, Live Mail Fix removing contacts from To field by clicking small X icon
 		addCssToDocument('.ContactPicker_AutoComplete img{position:static!important;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
+	} else if(hostname.indexOf('mb.softbank.jp')!=-1){			// PATCH-588, SoftBank Mobile History Plugin browser sniffing
+		window.opera.addEventListener('BeforeScript', function (e) {
+			if (e.element.src.indexOf('history.js') > -1) {
+				e.element.text = e.element.text.replace(/if \(!this.is_op && hash\)/gi, 'if (hash)');
+			}
+		}, false);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (SoftBank Mobile History Plugin browser sniffing). See browser.js for details');
 	} else if(hostname.indexOf('merriam-webster.com')>-1){			// PATCH-540, Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.
 		addCssToDocument('embed[hidden=true]{display:inline;width:0;height:0;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Merriam-Webster: override embed with hidden attribute. Conflicts with HTML global hidden attribute.). See browser.js for details');
@@ -1630,6 +1637,11 @@ function setTinyMCEVersion(e){
 		},false);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( Rabobank cancels t keypress). See browser.js for details');
+	} else if(hostname.indexOf('rede-expressos.pt')>-1 ){			// PATCH-422, Miscalculated IFRAME height prevents booking on rede-expressos
+		addCssToDocument('#fraHorarioIN, #fraBil1IN{min-height: 250px !important}');
+		
+			
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Miscalculated IFRAME height prevents booking on rede-expressos). See browser.js for details');
 	} else if(hostname.indexOf('renren.com')>-1){			// PATCH-536, renren.com - Unicode space like characters should not be converted in document.title
 		var getter=document.__lookupGetter__('title');
 		var setter=document.__lookupSetter__('title');
@@ -1752,6 +1764,17 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('tvguide.com')>-1){			// PATCH-274, TVGuide doesn't show program descriptions, due to browser sniffing
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (TVGuide doesn\'t show program descriptions, due to browser sniffing). See browser.js for details');
+	} else if(hostname.indexOf('twitter.com')>-1){			// PATCH-561, Twitter: allow selection in TEXTAREA
+		HTMLTextAreaElement.prototype.setAttribute=(function(s){
+			return function(n, v){
+				if(n=='dir' && this.getAttribute(n)===v){
+					return;
+				}
+				return s.apply(this,arguments);
+			}
+		})(HTMLTextAreaElement.prototype.setAttribute);
+		HTMLTextAreaElement.prototype.__defineSetter__('dir', function(v){ this.setAttribute('dir', v); });
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Twitter: allow selection in TEXTAREA). See browser.js for details');
 	} else if(hostname.indexOf('vgtv.no')>-1 || hostname.indexOf('movenetworkshd.com')>-1){			// PATCH-110, Work around browser sniffing for Move media player
 		opera.defineMagicVariable('QI', function(o){ o.browserIsGood=true; return o; }, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Work around browser sniffing for Move media player). See browser.js for details');
