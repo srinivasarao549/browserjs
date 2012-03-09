@@ -1,4 +1,4 @@
-// ABCxfdR6gUBLeG7hJL7ya+Z217BLkEJ46MRZMZDj0NueLqTnstHu5he8obdC3YvrGfOVAUNKbegpOkIkxXeKYeUej7Tg5HE9cLbBqbTVS44Aq6gYEXpBau3ehKvmVocVuVhEtgGmkSf8YghBpvXKfBC7B35/w6KpkobyMWGUM/SdmUaytvoxcHCwhoUe9uxV1lHHptCxdOnARi6Qp7uECdZ2DEhNnpvWD4oB/hKl69qpRMpWIjYA0OHZyHbaCBwOAlY0cE1Che2fs0Sa+QHiEA9qlmRHaJo2vBsezpGJaoOGC+NOpD6NWNIu55UKrzFhnebWDUwfbUFQcQ4N6iIOWg==
+// xPH2Q2Da3CE6jHnXEsmUvk1+xyn46OkDhw/Dx6Rd6up+Lc8y4Zr/uw7IJpDfSy/1uf0Q6ODJjY9Sx4pJhtyew7sXr6KZQV07Fo9hbN3V20tpQHmofM/LiXR6/pMyUNjnMomereLbjrgpdKlCljaPuMNdOHhIbH4cqHGIby42z1aQdiwjE23pyKT0qi67bqOWTUDGOe2ASWRqq2y5s3bzwwzbYRnS1Ode/TFQ9qH73tBCVyk4wPKdb+e9YeDlyuOnOBSEHCEJJI0wCtI7N6rD2/oCXMVQCXYcIDPI3XJthg05ReKHluRgc0L1Ft2ZkXkOj59OY+CLc2VYd6u314/mkA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.60 core 2.10.229, February 20, 2012. Active patches: 181 ';
+	var bjsversion=' Opera Desktop 11.60 core 2.10.229, March 8, 2012. Active patches: 179 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -1264,6 +1264,9 @@ function setTinyMCEVersion(e){
 		
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix missing menu and misplaced highlights on hk.centamap.com). See browser.js for details');
+	} else if(hostname.indexOf('huffingtonpost.com')>-1){			// PATCH-601, Huffingtonpost: Avoid ad overwrite
+		addPreprocessHandler(/\|\|adsUA\.indexOf\(\'opera\'\)>-1/,'');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Huffingtonpost: Avoid ad overwrite). See browser.js for details');
 	} else if(hostname.indexOf('infinitiusa.com')>-1 || hostname.indexOf('nissanusa.com')>-1){			// PATCH-529, Fix SiteCatalyst H.9 code on Nissan/Infiniti USA
 		opera.addEventListener('BeforeScript', function(e){
 			if (e.element.src.indexOf('codepack.incGlobPaths.true.content.js')>-1){
@@ -1345,8 +1348,6 @@ function setTinyMCEVersion(e){
 		 CSSStyleDeclaration.prototype.__lookupSetter__ = function(prop){
 			return styleSetterLookupMethod.call(document.createElement('span').style, prop);
 		 };
-				// PATCH-135, Live Mail Fix removing contacts from To field by clicking small X icon
-		addCssToDocument('.ContactPicker_AutoComplete img{position:static!important;}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Fix drag and drop in Hotmail\nMispositioned sprites due to missing CSS\nEmulating IE\'s cssText prope...). See browser.js for details');
 	} else if(hostname.indexOf('mb.softbank.jp')!=-1){			// PATCH-588, SoftBank Mobile History Plugin browser sniffing
 		window.opera.addEventListener('BeforeScript', function (e) {
@@ -1369,20 +1370,16 @@ function setTinyMCEVersion(e){
 		}, false);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make NBC videos work\nUnexpected script loading order breaks video player ready check). See browser.js for details');
-	} else if(hostname.indexOf('news.qq.com')>-1){			// PATCH-112, Requires add() method on SELECT elements
-		HTMLSelectElement.prototype.add=function(){this.appendChild.apply(this,arguments);};
-				// PATCH-112, weather.news.qq.com expects getElementById() to find named elements
+	} else if(hostname.indexOf('news.qq.com')>-1){			// PATCH-112, weather.news.qq.com expects getElementById() to find named elements
 		var gEBI=document.getElementById;
 		document.getElementById=function(){
 			var result=gEBI.apply(this, arguments);
 			if(!result)result=document.getElementsByName.apply(this,arguments)[0];
 			return result;
 		}
-				// PATCH-112, weather.news.qq.com uses document.all for browser detection
-		opera.defineMagicVariable('ie4',function(){return true;}, null);
 				// OTW-4861, qq.com uses IE-style CSS filters
 		fakeCSSFilters();
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Requires add() method on SELECT elements\nweather.news.qq.com expects getElementById() to find named...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (weather.news.qq.com expects getElementById() to find named elements\nqq.com uses IE-style CSS filter...). See browser.js for details');
 	} else if(hostname.indexOf('opera.com')>-1&& pathname.indexOf('/docs/browserjs/')==0){			// 0, Browser.js status and version reported on browser.js documentation page
 		document.addEventListener((parseFloat(opera.version())>9?'DOMContentLoaded':'load'),function(){
 			if(document.getElementById('browserjs_active')){
@@ -1495,15 +1492,6 @@ function setTinyMCEVersion(e){
 			}
 		},false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (nova.edu: browser sniffing). See browser.js for details');
-	} else if(hostname.indexOf('shoptime.com.br')>-1){			// PATCH-81, shoptime.com.br not possible to type since Opera does not support charCode
-		defineMagicFunction.call(opera, 'soNums',
-					function(real, e, args){
-						evt = event.keyCode;
-						if (evt <20 || (evt >47 && evt<58) ){return true;}
-		            return false;
-					},
-				null);
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (shoptime.com.br not possible to type since Opera does not support charCode). See browser.js for details');
 	} else if(hostname.indexOf('siren24.com')!=-1){			// SEOUL-609, ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script
 		navigator.appName = 'Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (ActiveX installation page redirect on siren24.com due to sniffing limitation on redirect script). See browser.js for details');
@@ -1567,6 +1555,13 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('tuenti.com')!=-1){			// PATCH-134, Videos not shown
 		navigator.userAgent += ' [NOT firefox/3]';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Videos not shown). See browser.js for details');
+	} else if(hostname.indexOf('tvguide.co.uk')>-1){			// PATCH-596, tvguide.co.uk - Fix double descriptions appearing in TV listing
+		opera.addEventListener('AfterScript', function(e) {
+			if (e.element.src.indexOf('boxover.js')>-1) {
+				document.addEventListener('mouseover',moveMouse,false);
+			}
+		}, false);
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (tvguide.co.uk - Fix double descriptions appearing in TV listing). See browser.js for details');
 	} else if(hostname.indexOf('tvguide.com')>-1){			// PATCH-274, TVGuide doesn't show program descriptions, due to browser sniffing
 		opera.defineMagicVariable('isSafari', function(){return true;}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (TVGuide doesn\'t show program descriptions, due to browser sniffing). See browser.js for details');
