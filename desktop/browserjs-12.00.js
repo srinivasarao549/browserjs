@@ -1,4 +1,4 @@
-// YkewI3ubN45E1eeKZQ/ZecgQcdv55zHFVeQBYi2BPvuPGYiIjtSp6M3zSJL8wo2YGheNIpsKJS4zWfoCJ1pzdBPOHrt82o9yE7sXnbeJi6DZ01lVEZBiFYOxosLXnJpbTPptU/DWkFkIynG/DpBR2U0kUL2LXw5xHsS0S9Iteva35/q3IWGOGkgTj+zgmhrMnBbfvak1e0wSLnBq/cVcH0YoQi0fpEsQVrFuj8uvK5ovLoAV6zU92jhfIlMoICvqMMrrqZiS4s6mmBLZAYBbKtwepJold55uHcQJdTG+MjxY4R+iurgTCfY4tITitinQNP9vhS3uUy2LTg6wXBJw4A==
+// E0/4UacnIgj+ULpWi+0n5bZp5zmBPRQEP0ISAhXgRqwDZilrmd9ZVJr9MaxxAVCtkmS3tAc5wqTeKOQFyzH4dSnGCVMVyB5Z9O5B9skdYOxOL4u3sqFYd0KZ8ZtOw9O0988nJ+4waajzr6aa74MvuGna7H6htZ2gpdUuWXRuK2hSknAPJoKlORFhlwLRvw/Pyos+dgc8v5dHdiFZkJg+UyyQB/1dFCg8Zeumc4+ASe1EBM2EWskKrCeAu07diX42HTIV2gDlH+q4YKHcE27MGWqiBS6euC/VPD6YoWWDNQA4Jxup2EcffmjoYjfONR9eeWxye6vtQsPfEDlg2XSArg==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 12.00 core 2.10.269, March 8, 2012. Active patches: 170 ';
+	var bjsversion=' Opera Desktop 12.00 core 2.10.282, March 13, 2012. Active patches: 166 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -128,32 +128,6 @@ function avoidDocumentWriteAbuse(contentRegexp){
 		}
 	};
 }
-function avoidTextareaWrapFreeze(){ // CORE-43563
-	var sA=document.createElement('textarea').setAttribute;
-	HTMLTextAreaElement.prototype.__defineSetter__('wrap', function(v){});
-
-	HTMLTextAreaElement.prototype.setAttribute=function(n,v){
-		if( /wrap/i.test(n) ){
-			return;
-		}
-		sA.apply(this,arguments);
-	}
-
-	var tmp,si,gi;
-	tmp=document.createElement('span');
-	gi=tmp.__lookupGetter__('innerHTML');
-	si=tmp.__lookupSetter__('innerHTML');
-	Element.prototype.__defineSetter__('innerHTML', function(v){
-		if( /<textarea [^>]* wrap="?off"?/i.test(v)){
-			v=v.replace( /<textarea ([^>]*) wrap="?off"?/i, '<textarea $1 ' );
-		}
-		return si.call(this, v);
-	});
-	Element.prototype.__defineGetter__('innerHTML', function(){
-		return gi.call(this);
-	});
-}
-
 	function fakeCSSFilters(){ // faking support for some of the common filters so that using them won't stop the script
 		var filterObj={apply:function(){}, play:function(){}, Apply:function(){}, Play:function(){}}; // some of the common functions
 		HTMLElement.prototype.filters=[ filterObj, filterObj, filterObj ]; // fake three applied filters with play and apply functions
@@ -346,8 +320,7 @@ function setTinyMCEVersion(e){
 
 
 
-	// Sending an extra onreadystatechange causes some ad scripts to eat memory
-// lines reversed on enter by workaround against old Opera bug
+	// lines reversed on enter by workaround against old Opera bug
 // TinyMCE 2.x uses document.selection in Opera
 // no code in TinyMCE 2.x HTML source editor because it expects a different order of load events
 // Generic JS library patches
@@ -360,23 +333,9 @@ function setTinyMCEVersion(e){
 // Workaround for jquery.jsonp plugin's workaround against missing onerror support
 // Disable sniffing in old HTMLArea editors
 // Asia-region Generic Patches
-// Work around Facebook's attachEvent usage in all.js
+// Make getUserMedia() scripts written according to current spec work
+// Facebook: work around iframe load event issue
 // TinyMCE double IFRAME init problem, some versions
-			// PATCH-177, Sending an extra onreadystatechange causes some ad scripts to eat memory
-	opera.addEventListener( 'BeforeEventListener.readystatechange', function(e){
-		var element=e.event.target;
-		preventDefault.call=random.call=postError.call=call;
-		var elId=element.sourceIndex;
-		if(!elId)element.__operaReadyStateFakeID__=elId=element.__operaReadyStateFakeID__||random.call(Math);
-		if( element.readyState == 'loaded' && element.tagName == 'SCRIPT' ){
-			if( e.listener['__operaReadyStateAlreadyCalled'+elId+'__'] ) {
-				preventDefault.call(e);
-				postError.call(opera, 'Opera applied workaround against double readystate events. See browser.js for details');
-			} else {
-				e.listener['__operaReadyStateAlreadyCalled'+elId+'__']  = true;
-			}
-		}
-	}, false);
 			// DSK-223254, lines reversed on enter by workaround against old Opera bug
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
 		if(tinyMCEVersionInfo.majorVersion<3 || ( tinyMCEVersionInfo.majorVersion==3 && (parseInt(tinyMCEVersionInfo.minorVersion)==0 || tinyMCEVersionInfo.minorVersion=='X' /*X: see CORE-15898*/ ))){
@@ -603,41 +562,21 @@ function setTinyMCEVersion(e){
 			opera.defineMagicFunction('checkNavigator',function(){return true;}); 
 		}
 	},false);
-			// PATCH-372, Work around Facebook's attachEvent usage in all.js
+			// PATCH-581, Make getUserMedia() scripts written according to current spec work
+	if( navigator.getUserMedia ){
+		if( ! window.URL )window.URL={};
+		if( ! window.URL.createObjectURL)window.URL.createObjectURL=function(obj){return obj;}
+	}
+			// PATCH-604, Facebook: work around iframe load event issue
 	opera.addEventListener( 'BeforeExternalScript', function(ev){
 		indexOf.call=addEventListener.call=removeEventListener.call=call;
-		
 		var name=ev.element.src;
-		if(indexOf.call(name,'connect.facebook.net')>-1 && indexOf.call(name,'all.js')>-1){ //PATCH-372, PATCH-386
-			var win_attachEvent=window.attachEvent;
-			document.attachEvent=undefined; //PATCH-576
-			if( window.fbAsyncInit && !window.fbAsyncInit._patched ){
-				var origFBAsyncInit=window.fbAsyncInit;
-				window.fbAsyncInit=function(){
-					window.attachEvent=undefined;
-					origFBAsyncInit.call(null);
-					window.attachEvent=win_attachEvent;
-				}
-				window.fbAsyncInit._patched=true;
-			}else{
-				window.attachEvent=undefined; 
-				addEventListener.call(opera, 'AfterScript', function(e){
-					if( window.FB && FB.init && ! FB.init._patched ){
-						(function(init){
-							FB.init=function(){
-								window.attachEvent=undefined;
-								init.apply(this,arguments);
-								window.attachEvent=win_attachEvent;
-							}
-						})(FB.init);
-						FB.init._patched=true;
-					}
-					window.attachEvent=win_attachEvent;
-					removeEventListener.call(opera, 'AfterScript', arguments.callee, false);
-				}, false);
-			}
+		if(indexOf.call(name,'connect.facebook.net')>-1 && indexOf.call(name,'all.js')>-1){
+			var ifrScrollingSetter = (document.createElement('iframe')).__lookupSetter__('scrolling');
+			var ifrScrollingGetter = (document.createElement('iframe')).__lookupGetter__('scrolling');
+			HTMLIFrameElement.prototype.__defineSetter__('scrolling', function(){ if(this.src=='')this.src='javascript:void(0);'; return ifrScrollingSetter.apply(this,arguments); });
+			HTMLIFrameElement.prototype.__defineGetter__('scrolling', function(){ return ifrScrollingGetter.apply(this,arguments); });
 		}
-	
 	},false);
 			// PATCH-373, TinyMCE double IFRAME init problem, some versions
 	opera.addEventListener('bjsOnTinyMCEScript', function(e){
@@ -946,11 +885,6 @@ function setTinyMCEVersion(e){
 		window.external=window.external||{};
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( video problems on T-online.de, VOD section\n video problems on T-online.de, no window.external dete...). See browser.js for details');
-	} else if(hostname.indexOf('.web.de')>-1){			// PATCH-586, web.de: hide browser upgrade message
-		if(pathname.indexOf('canvaspage')>-1){
-		 document.addEventListener('DOMContentLoaded',function(){try{hideNavigator()}catch(e){}},false);
-		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (web.de: hide browser upgrade message). See browser.js for details');
 	} else if(hostname.indexOf('.yahoo.')>-1){			// 0, Yahoo!
 		/* Yahoo! */
 	
@@ -1158,17 +1092,11 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('cnnturk.com')>-1){			// PATCH-509, cnnturk: work around CSS bug that causes footer content to float upwards
 		addCssToDocument('#fbtm div.dtc ul{position: static !important; display:inline !important}');
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (cnnturk: work around CSS bug that causes footer content to float upwards). See browser.js for details');
-	} else if(hostname.indexOf('codecademy.com')>-1){			// PATCH-592, Avoid freeze caused by regression related to TEXTAREA wrap attribute handling
-		avoidTextareaWrapFreeze();
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Avoid freeze caused by regression related to TEXTAREA wrap attribute handling). See browser.js for details');
 	} else if(hostname.indexOf('computerra.ru')>-1){			// PATCH-267, Make BBCode editor buttons work by disabling Opera sniffing
 		document.addEventListener('DOMContentLoaded', function(){
 			if(window.jsUtils&&window.jsUtils.bOpera)jsUtils.bOpera=false;
 		}, false);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Make BBCode editor buttons work by disabling Opera sniffing). See browser.js for details');
-	} else if(hostname.indexOf('css3clickchart.com')>-1){			// PATCH-592, Avoid freeze caused by regression related to TEXTAREA wrap attribute handling
-		avoidTextareaWrapFreeze();
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Avoid freeze caused by regression related to TEXTAREA wrap attribute handling). See browser.js for details');
 	} else if(hostname.indexOf('danawa.com')!=-1 && href.indexOf('danawa.com/product/item.html')!=-1){			// PATCH-14, Iframe content height is too small and not expanded on danawa.com
 		HTMLBodyElement.prototype.__defineGetter__('offsetHeight', function(){
 			return  (this.scrollHeight);
@@ -1219,14 +1147,12 @@ function setTinyMCEVersion(e){
 				);
 			}
 		}, false);
-				// PATCH-558, Facebook avoid chat list scroll
-		addPreprocessHandler(/else CSS\.hide\(this\._gripper\);this\._checkContentBoundaries\(\);return this;\}/,'else CSS.hide(this._gripper);return this;}');
 				// PATCH-573, Facebook's border-radius triggers hyperactive reflow bug, performance suffers
 		opera.addEventListener('BeforeCSS', function(e){
 			e.cssText = e.cssText.replace(/border-(top|bottom)-(right|left)-radius:3px/g, '');
 		}, false);
 		
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook ...). See browser.js for details');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Facebook: fake paste event to make show preview immediately after pasting links in status\nFacebook\'...). See browser.js for details');
 	} else if(hostname.indexOf('geforce.com')>-1&&pathname.toLowerCase().indexOf('/drivers')>-1){			// PATCH-521, geforce.com: fix unclickable options on custom select box
 		addCssToDocument('div.main,div.mainContent,div.rightNav,div.middle,div.contentMiddle,div.innerBox,div.innerMiddle{position:static !important;}');
 		
@@ -1235,6 +1161,9 @@ function setTinyMCEVersion(e){
 		opera.defineMagicVariable('is_nav', function(){return true;}, null);
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( BlueCross browser sniffing prevents insurance search). See browser.js for details');
+	} else if(hostname.indexOf('googletv.blogspot.com')>-1){			// PATCH-603, GoogleTV: fix broken word spacing - Opera bug
+		addCssToDocument('div.post-body div{text-align:inherit !important}');
+			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (GoogleTV: fix broken word spacing - Opera bug). See browser.js for details');
 	} else if(hostname.indexOf('hk.centamap.com')>-1){			// PATCH-318, Fix missing menu and misplaced highlights on hk.centamap.com
 		document.addEventListener('DOMContentLoaded',function(evt){
 			parent.document.body.__defineGetter__('offsetHeight',function(){ return parent.window.innerHeight; });
@@ -1270,9 +1199,6 @@ function setTinyMCEVersion(e){
 	} else if(hostname.indexOf('kort.arealinfo.dk')>-1){			// PATCH-348, Disable Opera detection that causes hidden content
 		opera.defineMagicVariable('op', function(){return false}, null);
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Disable Opera detection that causes hidden content). See browser.js for details');
-	} else if(hostname.indexOf('kotlin-demo.jetbrains.com')>-1){			// PATCH-592, Avoid freeze caused by regression related to TEXTAREA wrap attribute handling
-		avoidTextareaWrapFreeze();
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (Avoid freeze caused by regression related to TEXTAREA wrap attribute handling). See browser.js for details');
 	} else if(hostname.indexOf('kuwaitairways.com')>-1){			// PATCH-493, kuwaitairways.com - Fix browser sniffing
 		navigator.appName='Netscape';
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (kuwaitairways.com - Fix browser sniffing). See browser.js for details');
