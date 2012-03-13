@@ -1,4 +1,4 @@
-// MYn360sGTwj8qwxr32fqWVk/oxgjZaOPeJfY4gOFimvEVxWLAyylDOFkcpgt31ie9vM5SeWw7VaNZaCdLJh0bNQA4wIPzbtPKiYlA+nsy3XyAeqhRJ65NtfnX+blMN9xgxYWhnVjZ/Y9iUQtit6RmN7stsfv6KDySbgUguzCiiDivOjPvYDKUnBquYpTyPDwogqrA9F/gW/DyWhiUT5rt7ZJ5NC/J/ucBqNC1yl+L2fUYJNCn/6DwoYn9pOIFKmbn2HDuhg08re/lsukUapFYUU2rJhkxav0JrzjHZyRSpQAgj+5G06HO3FOC+AuYbaf1K0/LedO3ZE4U97H3pZTCQ==
+// Hevp7wpynH2mwFCvFwGpudL+6LQCLbFPfWEWfI3yQJIkaop82pf/OrShedzPQQ6Nk2DJyrkxzmDQbXpIAv/1v4h6sqYuhDXQM+IyNOz6EBKPW34Z7QqIbgXWCQxkZ24v0Z8B6/x/C9o5JR/FCptCJJebG5F/HDemL3YjHe9kXuCFWmVHX6czE/53qZqmYXo6D+bz26k+sTsTEaaB9wrqDwvZWImvmLY4eZSC7Fb562aogqW3gzlTBkPT6S7SytLd2dMmnYXPg3nXQwnH2MKJARdp1rzDm7aWgvNL08ZgMr6i4OnAhSifmKyqdO86+pfLYpMt7NT5emY0qIXM2q0yfA==
 /**
 ** Copyright (C) 2000-2012 Opera Software AS.  All rights reserved.
 **
@@ -18,7 +18,7 @@
 (function(opera){
 	if(!opera || (opera&&opera._browserjsran))return;
 	opera._browserjsran=true;
-	var bjsversion=' Opera Desktop 11.50 core 2.9.168, March 8, 2012. Active patches: 210 ';
+	var bjsversion=' Opera Desktop 11.50 core 2.9.168, March 13, 2012. Active patches: 209 ';
 	// variables and utility functions
 	var navRestore = {}; // keep original navigator.* values
 	var shouldRestore = false;
@@ -575,6 +575,11 @@ function setTinyMCEVersion(e){
 		if(indexOf.call(name,'connect.facebook.net')>-1 && indexOf.call(name,'all.js')>-1){ //PATCH-372, PATCH-386
 			var win_attachEvent=window.attachEvent;
 			document.attachEvent=undefined; //PATCH-576
+			var ifrScrollingSetter = (document.createElement('iframe')).__lookupSetter__('scrolling');
+			var ifrScrollingGetter = (document.createElement('iframe')).__lookupGetter__('scrolling');
+			HTMLIFrameElement.prototype.__defineSetter__('scrolling', function(){ if(this.src=='')this.src='javascript:void(0);'; return ifrScrollingSetter.apply(this,arguments); });
+			HTMLIFrameElement.prototype.__defineGetter__('scrolling', function(){ return ifrScrollingGetter.apply(this,arguments); });
+	
 			if( window.fbAsyncInit && !window.fbAsyncInit._patched ){
 				var origFBAsyncInit=window.fbAsyncInit;
 				window.fbAsyncInit=function(){
@@ -936,11 +941,6 @@ function setTinyMCEVersion(e){
 		window.external=window.external||{};
 		
 			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' ( video problems on T-online.de, VOD section\n video problems on T-online.de, no window.external dete...). See browser.js for details');
-	} else if(hostname.indexOf('.web.de')>-1){			// PATCH-586, web.de: hide browser upgrade message
-		if(pathname.indexOf('canvaspage')>-1){
-		 document.addEventListener('DOMContentLoaded',function(){try{hideNavigator()}catch(e){}},false);
-		}
-			if(self==top)postError.call(opera, 'Opera has modified the JavaScript on '+hostname+' (web.de: hide browser upgrade message). See browser.js for details');
 	} else if(hostname.indexOf('.yahoo.')>-1){			// 0, Yahoo!
 		/* Yahoo! */
 	
